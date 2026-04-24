@@ -1,0 +1,1949 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="x-layout-version" content="browser-v2-inline-safe" />
+  <title>Relatório Semanal — Bolsão</title>
+  <style>
+    :root {
+      --bg: #f5f3ef;
+      --paper: #fffdfa;
+      --text: #1b1d1f;
+      --muted: #616973;
+      --line: #ddd5cb;
+      --todo: #a16207;
+      --doing: #0f5d83;
+      --done: #1f7a3f;
+      --accent: #0e3b52;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: #1b1d1f;
+      color: var(--text);
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      background: #f5f3ef;
+      background:
+        radial-gradient(circle at 10% 0%, #fef7e9 0%, transparent 35%),
+        radial-gradient(circle at 100% 20%, #e9f6ff 0%, transparent 40%),
+        var(--bg);
+    }
+    .container {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 16px;
+    }
+    .hero {
+      background: #0e3b52;
+      background: linear-gradient(135deg, #07212e 0%, #0e3b52 65%, #2f6f8f 100%);
+      color: #f9fbfd;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(14, 59, 82, 0.25);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .hero-copy {
+      flex: 1 1 auto;
+      min-width: 260px;
+    }
+    .hero h1 { margin: 0 0 10px; font-size: 1.6rem; }
+    .hero p { margin: 4px 0; color: #dceaf2; }
+    .cards {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .card {
+      flex: 1 1 280px;
+      background: #fffdfa;
+      background: var(--paper);
+      border: 1px solid #ddd5cb;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    .label { margin: 0; font-size: 0.9rem; color: #616973; color: var(--muted); }
+    .value { margin: 8px 0; font-size: 1.7rem; font-weight: 700; }
+    .value span { font-size: 1rem; color: #616973; color: var(--muted); font-weight: 600; }
+    .delta { margin: 8px 0 0; font-size: 0.85rem; color: #616973; color: var(--muted); }
+    .bar-track {
+      width: 100%;
+      height: 8px;
+      background: #ebe7e1;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar-fill { height: 100%; border-radius: 999px; }
+    .bar-fill.todo { background: linear-gradient(90deg, #854d0e, #ca8a04); }
+    .bar-fill.doing { background: linear-gradient(90deg, #155e75, #0891b2); }
+    .bar-fill.done { background: linear-gradient(90deg, #166534, #22c55e); }
+    .section {
+      margin-top: 18px;
+      background: #fffdfa;
+      background: var(--paper);
+      border: 1px solid #ddd5cb;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .section h2 {
+      margin: 0;
+      padding: 14px 16px;
+      border-bottom: 1px solid #ddd5cb;
+      border-bottom: 1px solid var(--line);
+      font-size: 1.05rem;
+      background: #f7f4ef;
+    }
+    table.epic-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+    table.epic-table th, table.epic-table td {
+      border-bottom: 1px solid #ddd5cb;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      padding: 10px 12px;
+    }
+    table.epic-table th { background: #fcfaf6; font-size: 0.82rem; text-transform: uppercase; color: #41505e; }
+    table.epic-table tr:hover td { background: #fffef9; }
+    td.epic { min-width: 120px; }
+    td.epic small { color: #616973; color: var(--muted); }
+    .badge-discovery {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #111827;
+      color: #f9fafb;
+      font-size: 0.72rem;
+      font-weight: 700;
+      vertical-align: middle;
+      letter-spacing: 0.02em;
+    }
+    .countdown {
+      flex: 0 0 auto;
+      min-width: 150px;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(7, 33, 46, 0.36);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(2px);
+    }
+    .countdown.past {
+      background: rgba(17, 24, 39, 0.24);
+    }
+    .countdown-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .countdown-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #d9e7ef;
+    }
+    .countdown-date {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+    }
+    .countdown-box {
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(17, 24, 39, 0.34);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      text-align: center;
+    }
+    .countdown-number {
+      padding: 14px 8px 10px;
+      font-size: 2.5rem;
+      line-height: 1;
+      font-weight: 300;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .countdown-unit {
+      padding: 8px 8px 9px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #dbe8ef;
+    }
+    .table-delivery { font-weight: 700; margin-bottom: 6px; }
+    .task-row td { background: #fdfbf8; }
+    .task-cell { padding-top: 6px; padding-bottom: 12px; }
+    .task-toggle-wrap {
+      cursor: pointer;
+    }
+    .task-toggle-wrap > summary {
+      list-style: none;
+      display: block;
+      padding: 10px 12px;
+      font-weight: 600;
+      color: #273444;
+      cursor: pointer;
+      user-select: none;
+    }
+    .task-toggle-wrap > summary::-webkit-details-marker {
+      display: none;
+    }
+    .task-toggle-wrap > summary::before {
+      content: "\25B8\0020";
+      font-size: 0.85em;
+    }
+    .task-toggle-wrap[open] > summary::before {
+      content: "\25BE\0020";
+    }
+    .task-toggle-wrap > summary:focus {
+      outline: 2px solid #0f5d83;
+      outline-offset: -2px;
+    }
+    .task-toggle-panel {
+      border-top: 1px solid #ece4da;
+    }
+    .task-list {
+      margin: 0;
+      padding: 0 12px 12px;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+    .task-item {
+      border: 1px solid #ece4da;
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+    }
+    .task-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .task-title {
+      font-size: 0.88rem;
+      color: #1f2937;
+      line-height: 1.35;
+    }
+    .task-status {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    .task-status.todo { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+    .task-status.doing { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+    .task-status.done { background: #dcfce7; color: #166534; border-color: #86efac; }
+    .task-progress-label {
+      font-size: 0.78rem;
+      color: #5a6470;
+      margin-bottom: 6px;
+    }
+    .task-empty {
+      margin: 0;
+      padding: 0 12px 12px;
+      color: #6b7280;
+      font-size: 0.85rem;
+    }
+    .footnote {
+      margin-top: 14px;
+      color: #616973;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    @media (max-width: 900px) {
+      .hero {
+        flex-direction: column;
+      }
+      .countdown {
+        min-width: 100%;
+        width: 100%;
+      }
+      .cards { grid-template-columns: 1fr; }
+      .container { margin: 12px auto; padding: 10px; }
+      th, td { padding: 8px; }
+    }
+  </style>
+</head>
+<body data-layout-version="browser-v2-inline-safe">
+  <div class="container" style="max-width:1200px;margin:24px auto;padding:16px;">
+    <table role="presentation" data-report-top="safe-table" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;background:#0e3b52;border-radius:14px;overflow:hidden;">
+      <tr>
+        <td valign="top" style="padding:24px;">
+          <h1 style="margin:0 0 10px;font-size:1.6rem;line-height:1.2;color:#f9fbfd;">Relatório Semanal de Evolução — Bolsão</h1>
+          <p style="margin:4px 0;color:#dceaf2;font-size:1rem;">Semana: <strong>2026-W17</strong> | Data: <strong>2026-04-24</strong></p>
+          <p style="margin:4px 0;color:#dceaf2;font-size:1rem;">Domínio Jira: casasbahiatech.atlassian.net</p>
+          <p style="margin:4px 0;color:#dceaf2;font-size:1rem;">Total de histórias no escopo: <strong>63</strong></p>
+        </td>
+        <td valign="top" width="290" style="width:290px;padding:20px 20px 20px 0;">
+          <div class="countdown" style="display:block;min-width:150px;padding:12px;border-radius:12px;background:#2f4454;border:1px solid #8da0ad;" data-deploy-date="2026-06-01T00:00:00-03:00" data-deploy-label="01/06/2026" data-time-zone="America/Sao_Paulo">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;border-collapse:collapse;">
+              <tr>
+                <td class="countdown-title" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.04em;color:#d9e7ef;padding:0 0 10px;">Contagem para o deploy</td>
+                <td class="countdown-date" align="right" style="font-size:0.82rem;font-weight:700;color:#ffffff;padding:0 0 10px;">01/06/2026</td>
+              </tr>
+            </table>
+            <div class="countdown-grid" style="display:block;">
+              
+        <div class="countdown-box" style="border-radius:10px;overflow:hidden;background:rgba(17,24,39,0.34);border:1px solid rgba(255,255,255,0.12);text-align:center;" data-unit="dias">
+          <div class="countdown-number" style="padding:14px 8px 10px;font-size:2.5rem;line-height:1;font-weight:300;color:#ffffff;background:rgba(255,255,255,0.06);">38</div>
+          <div class="countdown-unit" style="padding:8px 8px 9px;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;color:#dbe8ef;">dias</div>
+        </div>
+      
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <table role="presentation" class="status-cards" data-cards-layout="3-cols" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:16px;width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;">
+      <tr>
+        
+      <td valign="top" style="padding:0 8px;">
+        <div class="card" style="display:block;background:#fffdfa;border:1px solid #ddd5cb;border-radius:12px;padding:16px;box-shadow:0 4px 10px rgba(0,0,0,0.05);min-height:178px;">
+          <p class="label" style="margin:0;font-size:0.9rem;color:#616973;">To do (Backlog)</p>
+          <p class="value" style="margin:8px 0;font-size:1.7rem;font-weight:700;color:#1b1d1f;">32 <span style="font-size:1rem;color:#616973;font-weight:600;">50.79%</span></p>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:50.79%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+          <p class="delta" style="margin:8px 0 0;font-size:0.85rem;color:#616973;">Evolução: -0.03 p.p.</p>
+        </div>
+      </td>
+    
+
+      <td valign="top" style="padding:0 8px;">
+        <div class="card" style="display:block;background:#fffdfa;border:1px solid #ddd5cb;border-radius:12px;padding:16px;box-shadow:0 4px 10px rgba(0,0,0,0.05);min-height:178px;">
+          <p class="label" style="margin:0;font-size:0.9rem;color:#616973;">Doing (a partir de Para Fazer)</p>
+          <p class="value" style="margin:8px 0;font-size:1.7rem;font-weight:700;color:#1b1d1f;">28 <span style="font-size:1rem;color:#616973;font-weight:600;">44.44%</span></p>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:44.44%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+          <p class="delta" style="margin:8px 0 0;font-size:0.85rem;color:#616973;">Evolução: +0.18 p.p.</p>
+        </div>
+      </td>
+    
+
+      <td valign="top" style="padding:0 8px;">
+        <div class="card" style="display:block;background:#fffdfa;border:1px solid #ddd5cb;border-radius:12px;padding:16px;box-shadow:0 4px 10px rgba(0,0,0,0.05);min-height:178px;">
+          <p class="label" style="margin:0;font-size:0.9rem;color:#616973;">Done (Pronto para Deploy)</p>
+          <p class="value" style="margin:8px 0;font-size:1.7rem;font-weight:700;color:#1b1d1f;">3 <span style="font-size:1rem;color:#616973;font-weight:600;">4.76%</span></p>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:4.76%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+          <p class="delta" style="margin:8px 0 0;font-size:0.85rem;color:#616973;">Evolução: -0.16 p.p.</p>
+        </div>
+      </td>
+    
+      </tr>
+    </table>
+
+    <div class="section" style="margin-top:18px;background:#fffdfa;border:1px solid #ddd5cb;border-radius:12px;overflow:hidden;">
+      <h2 style="margin:0;padding:14px 16px;border-bottom:1px solid #ddd5cb;font-size:1.05rem;background:#f7f4ef;color:#1b1d1f;">Visão por épico</h2>
+      <div style="overflow-x:auto;">
+        <table class="epic-table">
+          <thead>
+            <tr>
+              <th>Épic</th>
+              <th>Nome</th>
+              <th>Total</th>
+              <th>To do</th>
+              <th>Doing</th>
+              <th>Done</th>
+              <th>% Entrega</th>
+              <th>% Progresso Estimado</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+      <tr>
+        <td class="epic"><strong>DPROMO-1705</strong> <span class="badge-discovery">Discovery</span><br/><small>Concluído</small></td>
+        <td>[1P] [Loja Física] Disponibilizar limitador (regras e parâmetros) de desconto no GO - Fase 1 (Discovery)</td>
+        <td>0</td>
+        <td>0 (0%)</td>
+        <td>0 (0%)</td>
+        <td>0 (100%)</td>
+        <td>
+          <div class="table-delivery">100%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:100%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+        </td>
+        <td>
+          <div class="table-delivery">100%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:100%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+        </td>
+      </tr>
+      
+      <tr class="task-row">
+        <td colspan="8" class="task-cell">
+          <details class="task-toggle-wrap" style="border:1px solid #e7dfd6;border-radius:10px;background:#fffdf9;">
+            <summary class="task-toggle-button">Ver tasks linkadas (0)</summary>
+            <div class="task-toggle-panel">
+              <p class="task-empty">Nenhuma task encontrada para este épico.</p>
+            </div>
+          </details>
+        </td>
+      </tr>
+    
+    
+
+      <tr>
+        <td class="epic"><strong>DPROMO-1768</strong> <br/><small>Em Desenvolvimento</small></td>
+        <td>[1P] Bolsão de lojas físicas - Lista de SKU - Blocklist</td>
+        <td>16</td>
+        <td>0 (0%)</td>
+        <td>16 (100%)</td>
+        <td>0 (0%)</td>
+        <td>
+          <div class="table-delivery">0%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:0%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+        </td>
+        <td>
+          <div class="table-delivery">55%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+        </td>
+      </tr>
+      
+      <tr class="task-row">
+        <td colspan="8" class="task-cell">
+          <details class="task-toggle-wrap" style="border:1px solid #e7dfd6;border-radius:10px;background:#fffdf9;">
+            <summary class="task-toggle-button">Ver tasks linkadas (16)</summary>
+            <div class="task-toggle-panel">
+              <ul class="task-list">
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1770</strong> - [Frontend] - Criação de novo repositório para o Bolsão
+                  </div>
+                  <span class="task-status doing">Removido</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1772</strong> - Estruturação do projeto de backend
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1773</strong> - Estruturação do projeto de frontend para Bolsão
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1774</strong> - [Front] - Carga de SKUs
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1775</strong> - [Back] - Carga de SKUs
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1776</strong> - [Back] - Relação de SKUs da lista
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1777</strong> - [Front] - Relação de SKUs da lista
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1791</strong> - [Back] Excluir lista em massa
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1792</strong> - [Front] Excluir lista em massa
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1793</strong> - [Back]Exportar lista de bloqueio vigente
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1794</strong> - [Front] Exportar lista de bloqueio vigente
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1805</strong> - [Front] Busca de SKU na lista
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1806</strong> - [Back] Busca de SKU na lista
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1807</strong> - [Front] Download de template de lista de bloqueio
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1808</strong> - [Back] Download de template de lista de bloqueio
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1869</strong> - [Back] Buscar descrição e categoria na lista de skus
+                  </div>
+                  <span class="task-status doing">Em Teste</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            </ul>
+            </div>
+          </details>
+        </td>
+      </tr>
+    
+    
+
+      <tr>
+        <td class="epic"><strong>DPROMO-1771</strong> <br/><small>Concluído</small></td>
+        <td>[1P] Bolsão de lojas físicas - Perfil de Acesso</td>
+        <td>1</td>
+        <td>0 (0%)</td>
+        <td>0 (0%)</td>
+        <td>1 (100%)</td>
+        <td>
+          <div class="table-delivery">100%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:100%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+        </td>
+        <td>
+          <div class="table-delivery">100%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:100%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+        </td>
+      </tr>
+      
+      <tr class="task-row">
+        <td colspan="8" class="task-cell">
+          <details class="task-toggle-wrap" style="border:1px solid #e7dfd6;border-radius:10px;background:#fffdf9;">
+            <summary class="task-toggle-button">Ver tasks linkadas (1)</summary>
+            <div class="task-toggle-panel">
+              <ul class="task-list">
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1778</strong> - Estruturação de tabelas e carga de perfis/usuários
+                  </div>
+                  <span class="task-status done">Concluído</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 100%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:100%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+              </li>
+            </ul>
+            </div>
+          </details>
+        </td>
+      </tr>
+    
+    
+
+      <tr>
+        <td class="epic"><strong>DPROMO-1779</strong> <br/><small>Backlog</small></td>
+        <td>[1P] Bolsão de lojas físicas - Restrição de Acesso</td>
+        <td>2</td>
+        <td>2 (100%)</td>
+        <td>0 (0%)</td>
+        <td>0 (0%)</td>
+        <td>
+          <div class="table-delivery">0%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:0%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+        </td>
+        <td>
+          <div class="table-delivery">10%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:10%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+        </td>
+      </tr>
+      
+      <tr class="task-row">
+        <td colspan="8" class="task-cell">
+          <details class="task-toggle-wrap" style="border:1px solid #e7dfd6;border-radius:10px;background:#fffdf9;">
+            <summary class="task-toggle-button">Ver tasks linkadas (2)</summary>
+            <div class="task-toggle-panel">
+              <ul class="task-list">
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1834</strong> - [Back] Configuração dos perfis e restrições às funcionalidades
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1835</strong> - [front] Configuração dos perfis e restrições às funcionalidades
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            </ul>
+            </div>
+          </details>
+        </td>
+      </tr>
+    
+    
+
+      <tr>
+        <td class="epic"><strong>DPROMO-1795</strong> <br/><small>Backlog</small></td>
+        <td>[1P] Bolsão de lojas físicas - Alçadas de aprovação</td>
+        <td>3</td>
+        <td>3 (100%)</td>
+        <td>0 (0%)</td>
+        <td>0 (0%)</td>
+        <td>
+          <div class="table-delivery">0%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:0%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+        </td>
+        <td>
+          <div class="table-delivery">10%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:10%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+        </td>
+      </tr>
+      
+      <tr class="task-row">
+        <td colspan="8" class="task-cell">
+          <details class="task-toggle-wrap" style="border:1px solid #e7dfd6;border-radius:10px;background:#fffdf9;">
+            <summary class="task-toggle-button">Ver tasks linkadas (3)</summary>
+            <div class="task-toggle-panel">
+              <ul class="task-list">
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1836</strong> - [Back] Configuração dos perfis e restrições às funcionalidades
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1837</strong> - [Back] Carga das alçadas no banco de dados
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1877</strong> - [Back] Consulta de perfis e usuários com base nos valores
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            </ul>
+            </div>
+          </details>
+        </td>
+      </tr>
+    
+    
+
+      <tr>
+        <td class="epic"><strong>DPROMO-1796</strong> <br/><small>Backlog</small></td>
+        <td>[1P] Bolsão de lojas físicas - Consulta do Bolsão</td>
+        <td>4</td>
+        <td>4 (100%)</td>
+        <td>0 (0%)</td>
+        <td>0 (0%)</td>
+        <td>
+          <div class="table-delivery">0%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:0%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+        </td>
+        <td>
+          <div class="table-delivery">10%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:10%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+        </td>
+      </tr>
+      
+      <tr class="task-row">
+        <td colspan="8" class="task-cell">
+          <details class="task-toggle-wrap" style="border:1px solid #e7dfd6;border-radius:10px;background:#fffdf9;">
+            <summary class="task-toggle-button">Ver tasks linkadas (4)</summary>
+            <div class="task-toggle-panel">
+              <ul class="task-list">
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1838</strong> - [Back] Configuração do endpoint de consulta
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1839</strong> - [Back] Verificar presença do SKU na Blocklist
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1840</strong> - [Back] Verificar desconto no preço alçada
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1841</strong> - [Back] Verificar desconto nas alçadas de aprovação
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            </ul>
+            </div>
+          </details>
+        </td>
+      </tr>
+    
+    
+
+      <tr>
+        <td class="epic"><strong>DPROMO-1797</strong> <br/><small>Concluído</small></td>
+        <td>[1P] Bolsão de lojas físicas - Estrutura base</td>
+        <td>3</td>
+        <td>0 (0%)</td>
+        <td>1 (33.33%)</td>
+        <td>2 (66.67%)</td>
+        <td>
+          <div class="table-delivery">66.67%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:66.67%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+        </td>
+        <td>
+          <div class="table-delivery">85%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:85%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+        </td>
+      </tr>
+      
+      <tr class="task-row">
+        <td colspan="8" class="task-cell">
+          <details class="task-toggle-wrap" style="border:1px solid #e7dfd6;border-radius:10px;background:#fffdf9;">
+            <summary class="task-toggle-button">Ver tasks linkadas (3)</summary>
+            <div class="task-toggle-panel">
+              <ul class="task-list">
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1811</strong> - [api-desconto-lojas-fisicas] Criar estrutura base do projeto.
+                  </div>
+                  <span class="task-status done">Concluído</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 100%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:100%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1833</strong> - Provisionamento da infraestrutura
+                  </div>
+                  <span class="task-status doing">Cancelado</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1879</strong> - [api-desconto-lojas-fisicas] Criar projeto SimpleMediator
+                  </div>
+                  <span class="task-status done">Concluído</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 100%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:100%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+              </li>
+            </ul>
+            </div>
+          </details>
+        </td>
+      </tr>
+    
+    
+
+      <tr>
+        <td class="epic"><strong>DPROMO-1798</strong> <br/><small>Em Desenvolvimento</small></td>
+        <td>[1P] Bolsão de lojas físicas - Gestão do Bolsão</td>
+        <td>12</td>
+        <td>5 (41.67%)</td>
+        <td>7 (58.33%)</td>
+        <td>0 (0%)</td>
+        <td>
+          <div class="table-delivery">0%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:0%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+        </td>
+        <td>
+          <div class="table-delivery">36.25%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:36.25%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+        </td>
+      </tr>
+      
+      <tr class="task-row">
+        <td colspan="8" class="task-cell">
+          <details class="task-toggle-wrap" style="border:1px solid #e7dfd6;border-radius:10px;background:#fffdf9;">
+            <summary class="task-toggle-button">Ver tasks linkadas (12)</summary>
+            <div class="task-toggle-panel">
+              <ul class="task-list">
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1842</strong> - [Back] Criação do bolsão
+                  </div>
+                  <span class="task-status doing">Em Revisão de Código</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1843</strong> - [front] Criação do bolsão
+                  </div>
+                  <span class="task-status doing">Em Desenvolvimento</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1844</strong> - [Back] Lista de todos os bolsões criados
+                  </div>
+                  <span class="task-status doing">Em Desenvolvimento</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1845</strong> - [front] Lista de todos os bolsões criados
+                  </div>
+                  <span class="task-status doing">Em Desenvolvimento</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1846</strong> - [Back] Visualizar detalhes de um bolsão
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1847</strong> - [front] Visualizar detalhes de um bolsão
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1848</strong> - [Back] Edição do bolsão
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1849</strong> - [front] Edição do bolsão
+                  </div>
+                  <span class="task-status doing">Em Desenvolvimento</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1850</strong> - [Back] Importação massiva de operações (débito/crédito)
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1851</strong> - [front] Importação massiva de operações (débito/crédito)
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1881</strong> - [Back] Criação do bolsão - Saldo inicial com carga de arquivo
+                  </div>
+                  <span class="task-status doing">Em Desenvolvimento</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1890</strong> - [FRONT] Cancelamento do bolsão
+                  </div>
+                  <span class="task-status doing">Em Desenvolvimento</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            </ul>
+            </div>
+          </details>
+        </td>
+      </tr>
+    
+    
+
+      <tr>
+        <td class="epic"><strong>DPROMO-1799</strong> <br/><small>Em Desenvolvimento</small></td>
+        <td>[1P] Bolsão de lojas físicas - Sistema de aprovação</td>
+        <td>6</td>
+        <td>5 (83.33%)</td>
+        <td>1 (16.67%)</td>
+        <td>0 (0%)</td>
+        <td>
+          <div class="table-delivery">0%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:0%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+        </td>
+        <td>
+          <div class="table-delivery">17.5%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:17.5%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+        </td>
+      </tr>
+      
+      <tr class="task-row">
+        <td colspan="8" class="task-cell">
+          <details class="task-toggle-wrap" style="border:1px solid #e7dfd6;border-radius:10px;background:#fffdf9;">
+            <summary class="task-toggle-button">Ver tasks linkadas (6)</summary>
+            <div class="task-toggle-panel">
+              <ul class="task-list">
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1853</strong> - [Front] Carga e listagem de motivos
+                  </div>
+                  <span class="task-status doing">Em Desenvolvimento</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1854</strong> - [Back] Consulta de solicitações com agrupamento por abas
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1855</strong> - [front] Consulta de solicitações com agrupamento por abas
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1856</strong> - [Back] Aprovar/Rejeitar solicitação via interface
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1857</strong> - [Front] Aprovar/Rejeitar solicitação via interface
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1858</strong> - [Back] Aprovar/Rejeitar solicitação via canal
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            </ul>
+            </div>
+          </details>
+        </td>
+      </tr>
+    
+    
+
+      <tr>
+        <td class="epic"><strong>DPROMO-1800</strong> <br/><small>Backlog</small></td>
+        <td>[1P] Bolsão de lojas físicas - Solicitação de liberação</td>
+        <td>7</td>
+        <td>6 (85.71%)</td>
+        <td>1 (14.29%)</td>
+        <td>0 (0%)</td>
+        <td>
+          <div class="table-delivery">0%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:0%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+        </td>
+        <td>
+          <div class="table-delivery">16.43%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:16.43%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+        </td>
+      </tr>
+      
+      <tr class="task-row">
+        <td colspan="8" class="task-cell">
+          <details class="task-toggle-wrap" style="border:1px solid #e7dfd6;border-radius:10px;background:#fffdf9;">
+            <summary class="task-toggle-button">Ver tasks linkadas (7)</summary>
+            <div class="task-toggle-panel">
+              <ul class="task-list">
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1852</strong> - [Back] Carga e listagem de motivos
+                  </div>
+                  <span class="task-status doing">Para Revisão de Código</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1859</strong> - [Back] Verificação do desconto nas alçadas de aprovação
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1860</strong> - [Back] Criação de reserva de valor sem aprovação
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1861</strong> - [Back] Criar solicitação com pedido de aprovação
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1862</strong> - [Back] Consulta de status de uma solicitação
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1863</strong> - [Back] Comunicar solicitações (com e sem aprovação)
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1880</strong> - [Back] Consultar os motivos para solicitação de desconto
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            </ul>
+            </div>
+          </details>
+        </td>
+      </tr>
+    
+    
+
+      <tr>
+        <td class="epic"><strong>DPROMO-1801</strong> <br/><small>Backlog</small></td>
+        <td>[1P] Bolsão de lojas físicas - Uso do Bolsão</td>
+        <td>3</td>
+        <td>3 (100%)</td>
+        <td>0 (0%)</td>
+        <td>0 (0%)</td>
+        <td>
+          <div class="table-delivery">0%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:0%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+        </td>
+        <td>
+          <div class="table-delivery">10%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:10%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+        </td>
+      </tr>
+      
+      <tr class="task-row">
+        <td colspan="8" class="task-cell">
+          <details class="task-toggle-wrap" style="border:1px solid #e7dfd6;border-radius:10px;background:#fffdf9;">
+            <summary class="task-toggle-button">Ver tasks linkadas (3)</summary>
+            <div class="task-toggle-panel">
+              <ul class="task-list">
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1864</strong> - [Back] Validação se o desconto pode ser utilizado
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1865</strong> - [Back] Uso do desconto aplicado sem solitação (alçada)
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1866</strong> - [Back] Efetivação de reserva via solicitação
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            </ul>
+            </div>
+          </details>
+        </td>
+      </tr>
+    
+    
+
+      <tr>
+        <td class="epic"><strong>DPROMO-1802</strong> <br/><small>Backlog</small></td>
+        <td>[1P] Bolsão de lojas físicas - Gestão de SLA</td>
+        <td>1</td>
+        <td>1 (100%)</td>
+        <td>0 (0%)</td>
+        <td>0 (0%)</td>
+        <td>
+          <div class="table-delivery">0%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:0%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+        </td>
+        <td>
+          <div class="table-delivery">10%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:10%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+        </td>
+      </tr>
+      
+      <tr class="task-row">
+        <td colspan="8" class="task-cell">
+          <details class="task-toggle-wrap" style="border:1px solid #e7dfd6;border-radius:10px;background:#fffdf9;">
+            <summary class="task-toggle-button">Ver tasks linkadas (1)</summary>
+            <div class="task-toggle-panel">
+              <ul class="task-list">
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1867</strong> - [Back] Reprovação de solicitações expiradas
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            </ul>
+            </div>
+          </details>
+        </td>
+      </tr>
+    
+    
+
+      <tr>
+        <td class="epic"><strong>DPROMO-1871</strong> <br/><small>Backlog</small></td>
+        <td>[QA] Bolsão de lojas físicas - Automação testes</td>
+        <td>5</td>
+        <td>3 (60%)</td>
+        <td>2 (40%)</td>
+        <td>0 (0%)</td>
+        <td>
+          <div class="table-delivery">0%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill done" style="width:0%;height:100%;border-radius:999px;background:#22c55e;"></div>
+    </div>
+  
+        </td>
+        <td>
+          <div class="table-delivery">28%</div>
+          
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:28%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+        </td>
+      </tr>
+      
+      <tr class="task-row">
+        <td colspan="8" class="task-cell">
+          <details class="task-toggle-wrap" style="border:1px solid #e7dfd6;border-radius:10px;background:#fffdf9;">
+            <summary class="task-toggle-button">Ver tasks linkadas (5)</summary>
+            <div class="task-toggle-panel">
+              <ul class="task-list">
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1872</strong> - [QA] Carga de Skus
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1876</strong> - [QA] Automação Bolsão - Lista de SKUs (Blocklist) APIs
+                  </div>
+                  <span class="task-status doing">Em Desenvolvimento</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1884</strong> - [QA] Implementação do QA Test Assist fase 1 - dinamicas-promo-online-api 
+                  </div>
+                  <span class="task-status doing">Para Revisão de Código</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 55%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill doing" style="width:55%;height:100%;border-radius:999px;background:#0891b2;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1893</strong> - [QA ] Automatizado - Bolsão - Tela Lista de SKUs - Validar frontend x figma
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            
+
+              <li class="task-item">
+                <div class="task-head">
+                  <div class="task-title">
+                    <strong>DPROMO-1894</strong> - [QA] Automatizado - estruturar projeto para mcp figma
+                  </div>
+                  <span class="task-status todo">Backlog</span>
+                </div>
+                <div class="task-progress-label">Progresso estimado: 10%</div>
+                
+    <div class="bar-track" style="width:100%;height:8px;background:#ebe7e1;border-radius:999px;overflow:hidden;">
+      <div class="bar-fill todo" style="width:10%;height:100%;border-radius:999px;background:#ca8a04;"></div>
+    </div>
+  
+              </li>
+            </ul>
+            </div>
+          </details>
+        </td>
+      </tr>
+    
+    
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="footnote">JQL utilizada para histórias: parentEpic in (DPROMO-1705,DPROMO-1768,DPROMO-1771,DPROMO-1779,DPROMO-1795,DPROMO-1796,DPROMO-1797,DPROMO-1798,DPROMO-1799,DPROMO-1800,DPROMO-1801,DPROMO-1802,DPROMO-1871) ORDER BY key</p>
+    <p class="footnote">Regra: To do = Backlog, Doing = demais status, Done = Pronto para Deploy, Concluído ou Done.</p>
+    <p class="footnote"><strong>Última atualização do report (consulta Jira + progresso):</strong> 24/04/2026, 17:56:13 (BRT)</p>
+  </div>
+  <script>
+    (function () {
+      const countdown = document.querySelector('.countdown[data-deploy-date]');
+      if (!countdown) return;
+
+      const deployDate = new Date(countdown.dataset.deployDate);
+      const deployLabel = countdown.dataset.deployLabel || '01/06/2026';
+      const timeZone = countdown.dataset.timeZone || 'America/Sao_Paulo';
+      const title = countdown.querySelector('.countdown-title');
+      const subtitle = countdown.querySelector('.countdown-date');
+      const units = {
+        dias: countdown.querySelector('[data-unit="dias"] .countdown-number'),
+      };
+
+      function pad(value) {
+        return String(Math.max(0, value)).padStart(2, '0');
+      }
+
+      function getDatePartsInTimeZone(date) {
+        const formatter = new Intl.DateTimeFormat('en-CA', {
+          timeZone,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        });
+
+        const parts = formatter.formatToParts(date);
+        const get = (type) => Number(parts.find((part) => part.type === type)?.value);
+
+        return {
+          year: get('year'),
+          month: get('month'),
+          day: get('day')
+        };
+      }
+
+      function getDayDiff() {
+        const today = getDatePartsInTimeZone(new Date());
+        const target = getDatePartsInTimeZone(deployDate);
+        const todayUtc = Date.UTC(today.year, today.month - 1, today.day);
+        const targetUtc = Date.UTC(target.year, target.month - 1, target.day);
+        return Math.round((targetUtc - todayUtc) / 86400000);
+      }
+
+      function renderCountdown() {
+        const dayDiff = getDayDiff();
+
+        if (dayDiff <= 0) {
+          countdown.classList.add('past');
+          if (title) title.textContent = 'Deploy realizado';
+          if (subtitle) subtitle.textContent = deployLabel;
+          units.dias.textContent = '00';
+          return;
+        }
+
+        countdown.classList.remove('past');
+        if (title) title.textContent = 'Contagem para o deploy';
+        if (subtitle) subtitle.textContent = deployLabel;
+        units.dias.textContent = pad(dayDiff);
+      }
+
+      renderCountdown();
+      window.setInterval(renderCountdown, 60000);
+    })();
+  </script>
+</body>
+</html>
